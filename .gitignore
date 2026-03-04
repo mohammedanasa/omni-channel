@@ -1,0 +1,41 @@
+### Python & Virtual Environments ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+migrations/
+*.pyc
+*.pyd
+*.so
+
+# Distribution / packaging
+.Python
+build/
+dist/
+egg-info/
+*.egg
+
+# Virtual Environment
+# You should choose one or the other based on your virtual environment tool
+venv/
+env/
+.venv/
+.env/
+ 
+---
+
+### Django / Web Frameworks ###
+# Database files (local SQLite file)
+*.sqlite3
+db.sqlite3
+
+# Media and static assets collected locally
+media/
+*.pyc
+*.db
+*.pid
+
+# Ignore Django Migrations in Development if you are working on team
+
+# Only for Development only
+**/migrations/**
+**/migrations
+**/migrations/__init__.py
