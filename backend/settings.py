@@ -36,7 +36,7 @@ SHARED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "rest_framework.authtoken",
     "accounts",
-    # "channels",
+    "channels",
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "django_extensions",
@@ -46,9 +46,9 @@ SHARED_APPS = [
 TENANT_APPS = [
     "locations",
     "products",
-    # "integrations",
-    # "orders",
-    # "webhooks",
+    "integrations",
+    "orders",
+    "webhooks",
     ]
     
 # INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
@@ -255,12 +255,12 @@ DEFAULT_FROM_EMAIL = 'noreply@mydjangosystem.com'
 SERVER_EMAIL = 'support@mydjangosystem.com'
 
 # ── Celery ──
-# CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
-# CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://localhost:6379/0")
-# CELERY_ACCEPT_CONTENT = ["json"]
-# CELERY_TASK_SERIALIZER = "json"
-# CELERY_RESULT_SERIALIZER = "json"
-# CELERY_TIMEZONE = "UTC"
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://localhost:6379/0")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
 
 TENANT_TESTING = True  # prevents schema drop issues in tests
 TESTING = True

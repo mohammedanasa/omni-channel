@@ -13,13 +13,13 @@ LOCATION_HEADER = OpenApiParameter(name="X-Location-ID", type=str, location="hea
                                    description="Optional Location ID to scope products")
 
 
-# CHANNEL_LINK_HEADER = OpenApiParameter(
-#     name="X-Channel-Link-ID",
-#     type=OpenApiTypes.STR,
-#     location=OpenApiParameter.HEADER,
-#     required=False,
-#     description="Optional ChannelLink UUID for channel-specific operations",
-# )
+CHANNEL_LINK_HEADER = OpenApiParameter(
+    name="X-Channel-Link-ID",
+    type=OpenApiTypes.STR,
+    location=OpenApiParameter.HEADER,
+    required=False,
+    description="Optional ChannelLink UUID for channel-specific operations",
+)
 
 
 def tenant_schema(tag, *extra_params):

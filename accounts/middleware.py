@@ -47,25 +47,25 @@ class TenantFromHeaderMiddleware:
         "/api/v1/categories/",
         "/api/v1/tax-rates/",
         "/api/v1/locations/",
-        # "/api/v1/channel-links/",
-        # "/api/v1/product-channel-configs/",
-        # "/api/v1/orders/",
-        # "/api/v1/webhooks/endpoints/",
-        # "/api/v1/webhooks/logs/",
+        "/api/v1/channel-links/",
+        "/api/v1/product-channel-configs/",
+        "/api/v1/orders/",
+        "/api/v1/webhooks/endpoints/",
+        "/api/v1/webhooks/logs/",
     ]
 
     # Paths that resolve tenant themselves (e.g. from ChannelLink UUID)
-    # TENANT_EXEMPT_PREFIXES = [
-    #     "/api/v1/webhooks/inbound/",
-    # ]
+    TENANT_EXEMPT_PREFIXES = [
+        "/api/v1/webhooks/inbound/",
+    ]
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def _requires_tenant(self, path):
         """Check if the request path belongs to a tenant-only app."""
-        # if any(path.startswith(prefix) for prefix in self.TENANT_EXEMPT_PREFIXES):
-        #     return False
+        if any(path.startswith(prefix) for prefix in self.TENANT_EXEMPT_PREFIXES):
+            return False
         return any(path.startswith(prefix) for prefix in self.TENANT_ONLY_PREFIXES)
 
     def __call__(self, request):
