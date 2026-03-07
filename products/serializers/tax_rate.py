@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 
 from ..models import TaxRate
 
@@ -88,6 +90,7 @@ class TaxRateSerializer(serializers.ModelSerializer):
     
     # ========== METHODS ==========
     
+    @extend_schema_field(OpenApiTypes.STR)
     def get_display_value(self, obj):
         """
         Generate human-readable tax value.

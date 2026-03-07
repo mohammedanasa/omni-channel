@@ -1027,6 +1027,7 @@ class NestedProductSerializer(serializers.ModelSerializer):
     
     # ========== COMPUTED FIELD METHODS ==========
     
+    @extend_schema_field({'type': 'array', 'items': {'type': 'string'}})
     def get_pos_category_ids(self, obj):
         """Get list of category IDs"""
         return list(obj.categories.values_list('pos_category_id', flat=True))
@@ -1096,16 +1097,17 @@ class NestedProductSerializer(serializers.ModelSerializer):
                 'is_assigned': False
             }
     
+    @extend_schema_field({'type': 'array', 'items': {'type': 'object'}})
     def get_sub_products(self, obj):
         """
         Recursively serialize sub-products.
-        
+
         Tracks recursion depth to prevent infinite loops.
         Stops at max_depth (default: 10).
-        
+
         Args:
             obj (Product): Product instance
-            
+
         Returns:
             list: Nested product data
         """
@@ -1135,6 +1137,7 @@ class NestedProductSerializer(serializers.ModelSerializer):
         
         return serializer.data
     
+    @extend_schema_field(OpenApiTypes.INT)
     def get_price(self, obj):
         """
         Get effective price with ALL overrides.
