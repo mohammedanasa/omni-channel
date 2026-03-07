@@ -25,14 +25,19 @@ CHANNEL_LINK_HEADER = OpenApiParameter(
 def tenant_schema(tag, *extra_params):
     """
     DRY decorator that applies X-Tenant-ID (and any extra params)
-    to every standard ModelViewSet action.
+    to every standard ViewSet action that exists on the class.
 
     Usage:
         @tenant_schema("Products", LOCATION_HEADER)
         class ProductViewSet(viewsets.ModelViewSet): ...
     """
+    ALL_ACTIONS = ["list", "retrieve", "create", "update", "partial_update", "destroy"]
     params = [TENANT_HEADER, *extra_params]
-    actions = ["list", "retrieve", "create", "update", "partial_update", "destroy"]
-    return extend_schema_view(
-        **{action: extend_schema(tags=[tag], parameters=params) for action in actions}
-    )
+
+    def decorator(cls):
+        actions = [a for a in ALL_ACTIONS if hasattr(cls, a)]
+        return extend_schema_view(
+            **{action: extend_schema(tags=[tag], parameters=params) for action in actions}
+        )(cls)
+
+    return decorator

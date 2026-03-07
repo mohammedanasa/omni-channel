@@ -220,7 +220,9 @@ SPECTACULAR_SETTINGS = {
         'drf_spectacular.hooks.postprocess_schema_enums',
         'backend.settings.postprocess_capitalize_tags',
     ],
-    # ReDoc specific settings can be passed here
+    'ENUM_NAME_OVERRIDES': {
+        'OrderStatusEnum': 'orders.models.OrderStatus',
+    },
     'REDOC_UI_SETTINGS': {
         'hideDownloadButton': True,
         'expandResponses': '200,201',
