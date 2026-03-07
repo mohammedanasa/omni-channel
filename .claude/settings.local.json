@@ -1,12 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cat:*)",
-      "Bash(source .venv/bin/activate && DJANGO_SETTINGS_MODULE=backend.settings python -c \"import django; django.setup\\(\\); print\\('Django setup OK'\\)\" 2>&1)",
-      "Bash(tail:*)",
-      "Bash(source .venv/bin/activate && python manage.py makemigrations channels integrations orders webhooks 2>&1)",
-      "Bash(python3:*)",
-      "Bash(find:*)"
+      "Bash(ls:*)",
+      "Bash(python:*)"
     ]
   }
 }

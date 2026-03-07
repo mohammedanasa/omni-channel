@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import BaseUUIDModel
+from common.models import BaseUUIDModel
 
 class Location(BaseUUIDModel):
     name = models.CharField(max_length=200)

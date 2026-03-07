@@ -1,40 +1,4 @@
-# from django.utils.deprecation import MiddlewareMixin
-# from django.db import connection
-# from django_tenants.utils import get_tenant_model
-# from django.core.exceptions import PermissionDenied
-
-# class TenantFromHeaderMiddleware(MiddlewareMixin):
-#     """
-#     Switch tenant schema using X-Tenant-ID header.
-#     """
-
-#     def process_request(self, request):
-#         tenant_id = request.headers.get("X-Tenant-ID")
-
-#         # No tenant -> use public schema
-#         if not tenant_id:
-#             connection.set_schema_to_public()
-#             return
-
-#         TenantModel = get_tenant_model()
-
-#         try:
-#             tenant = TenantModel.objects.get(id=tenant_id)
-#         except TenantModel.DoesNotExist:
-#             raise PermissionDenied("Invalid Tenant ID")
-
-#         request.tenant = tenant
-#         connection.set_tenant(tenant)   # <<< REQUIRED LINE
-
-#         print(f"✔ Tenant switched → {tenant.schema_name}")
-
-#     def process_response(self, request, response):
-#         connection.set_schema_to_public()
-#         return response
-
-
 import uuid as _uuid
-
 from django.db import connection
 from django.http import JsonResponse
 from django_tenants.utils import get_tenant_model

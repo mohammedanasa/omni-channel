@@ -3,8 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from helpers.permissions.permissions import HasTenantAccess
 
-from .models import Location
-from .serializers import LocationSerializer
+from ..models import Location
+from ..serializers import LocationSerializer
 from accounts.permissions import IsMerchantOwner
 from helpers.common import tenant_schema
 

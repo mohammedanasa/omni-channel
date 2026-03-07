@@ -1,18 +1,5 @@
-from djoser import serializers
-from django.contrib.auth import get_user_model
-from django_tenants.utils import get_tenant_domain_model
-from .models import Merchant, Domain
+from ..models import Merchant, Domain
 from rest_framework import serializers as drf_serializers
-
-
-User = get_user_model()
-
-
-class UserCreateSerializer(serializers.UserCreateSerializer):
-    class Meta(serializers.UserCreateSerializer.Meta):
-        model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'password')
-
 
 class MerchantSerializer(drf_serializers.ModelSerializer):
     """General serializer for listing and detail views."""
