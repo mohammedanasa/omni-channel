@@ -33,7 +33,7 @@ from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import gettext_lazy as _
-from accounts.models import BaseUUIDModel
+from common.models import BaseUUIDModel
 from .tax_rate import TaxRate
 from .category import Category
 

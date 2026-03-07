@@ -12,54 +12,6 @@ from .serializers import (
 )
 from .permissions import IsMerchantOwner
 
-# @extend_schema_view(
-#     list=extend_schema(tags=["Merchants"]),
-#     retrieve=extend_schema(tags=["Merchants"]),
-#     create=extend_schema(tags=["Merchants"]),
-#     update=extend_schema(tags=["Merchants"]),
-#     partial_update=extend_schema(tags=["Merchants"]),
-#     destroy=extend_schema(tags=["Merchants"]),
-# )
-# class MerchantViewSet(viewsets.ModelViewSet):
-#     queryset = Merchant.objects.all()
-#     permission_classes = [IsAuthenticated]
-
-#     def get_queryset(self):
-#         """
-#         Only return merchants owned by the logged-in user.
-#         """
-#         return Merchant.objects.filter(owner=self.request.user)
-
-#     def get_serializer_class(self):
-#         if self.action == "create":
-#             return MerchantCreateSerializer
-#         if self.action in ["update", "partial_update"]:
-#             return MerchantUpdateSerializer
-#         return MerchantSerializer
-
-#     def get_permissions(self):
-#         """
-#         Owner may update/delete, but listing/creating only needs authentication.
-#         """
-#         if self.action in ["update", "partial_update", "destroy", "retrieve"]:
-#             return [IsAuthenticated(), IsMerchantOwner()]
-#         return [IsAuthenticated()]
-
-#     def destroy(self, request, *args, **kwargs):
-#         """
-#         Override delete to ensure domain + schema removal happens cleanly.
-#         """
-#         merchant = self.get_object()
-
-#         if merchant.owner != request.user:
-#             return Response(
-#                 {"detail": "You do not have permission to delete this merchant."},
-#                 status=status.HTTP_403_FORBIDDEN
-#             )
-
-#         merchant.delete()  # Django-tenants will drop schema
-
-#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @extend_schema_view(
     list=extend_schema(tags=["Merchants"]),

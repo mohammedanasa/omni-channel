@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.db import models
-from accounts.models import BaseUUIDModel
+from common.models import BaseUUIDModel
 from .product import Product
 
 

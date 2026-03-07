@@ -1,23 +1,8 @@
-import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
-from django_tenants.models import TenantMixin, DomainMixin
-
-
-
-class BaseUUIDModel(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        unique=True,
-    )
-
-    class Meta:
-        abstract = True
-
+from common.models import BaseUUIDModel
 
 
 
@@ -76,16 +61,3 @@ class User(BaseUUIDModel, AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
     
-
-class Merchant(BaseUUIDModel,TenantMixin):
-    name = models.CharField(max_length=100)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="merchants")
-
-    auto_create_schema = True
-
-    def __str__(self):
-        return self.name
-
-class Domain(DomainMixin):
-    pass
-
