@@ -44,11 +44,7 @@ uritemplate==4.2.0
 urllib3==2.5.0
 celery==5.4.0
 redis==5.2.1
-<<<<<<< HEAD
-django-celery-beat==2.7.0
-=======
 django-celery-beat==2.9.0
 django-extensions==3.2.3
->>>>>>> main
 gunicorn==23.0.0
 whitenoise==6.9.0
