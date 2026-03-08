@@ -53,7 +53,17 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Generate migrations
-        run: python manage.py makemigrations accounts locations products channels integrations orders webhooks
+        run: |
+          # Detect which apps are installed and generate migrations only for those
+          python -c "
+          import django, os
+          os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+          django.setup()
+          from django.apps import apps
+          candidates = ['accounts','locations','products','channels','integrations','orders','webhooks']
+          installed = [a for a in candidates if apps.is_installed(a)]
+          print(' '.join(installed))
+          " | xargs python manage.py makemigrations
 
       - name: Run tests
         run: pytest -s --tb=short
