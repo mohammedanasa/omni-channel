@@ -248,6 +248,12 @@ DATABASES = {
     }
 }
 
+# Neon (and most cloud Postgres) requires SSL
+if config("DB_SSLMODE", default=""):
+    DATABASES["default"]["OPTIONS"] = {
+        "sslmode": config("DB_SSLMODE"),
+    }
+
 DATABASE_ROUTERS = (
     "django_tenants.routers.TenantSyncRouter",
 )
