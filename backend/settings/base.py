@@ -3,17 +3,11 @@ from pathlib import Path
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-0t$lb0*xalq=40di6p@msbfew!9agtwf535q)qo_*ea-9qve9h")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", default=True, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="", cast=lambda v: [h.strip() for h in v.split(",") if h.strip()] if v else [])
 
@@ -21,11 +15,12 @@ RENDER_EXTERNAL_HOSTNAME = config("RENDER_EXTERNAL_HOSTNAME", default="")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+ALLOWED_HOSTS.append("127.0.0.1")
 
 # Application definition
 
 SHARED_APPS = [
-    "django_tenants", 
+    "django_tenants",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -39,12 +34,12 @@ SHARED_APPS = [
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
     "rest_framework.authtoken",
+    "corsheaders",
     "accounts",
     "channels",
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "django_extensions",
-
 ]
 
 TENANT_APPS = [
@@ -53,20 +48,19 @@ TENANT_APPS = [
     "integrations",
     "orders",
     "webhooks",
-    ]
-    
-# INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+    "menus",
+]
+
 INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 
 
 MIDDLEWARE = [
-    # "django_tenants.middleware.main.TenantMainMiddleware",
-
     "accounts.middleware.TenantFromHeaderMiddleware",
 
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -94,63 +88,43 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
+# Static files
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-#------------------ THIRD PARTY SETTINGS ------------------#
+# ──────────────────── THIRD PARTY SETTINGS ──────────────────── #
 AUTH_USER_MODEL = "accounts.User"
 
-#EMAIL CONFIGURATION
-EMAIL_BACKEND = config("EMAIL_BACKEND")
-EMAIL_HOST = config("EMAIL_HOST")
-EMAIL_PORT = config("EMAIL_PORT", cast=int)
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
+# EMAIL CONFIGURATION
+EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = config("EMAIL_HOST", default="")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 
-#REST FRAMEWORK CONFIGURATION
+# REST FRAMEWORK CONFIGURATION
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -168,7 +142,7 @@ SIMPLE_JWT = {
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
 
-#DJOSER CONFIGURATION
+# DJOSER CONFIGURATION
 DJOSER = {
     "LOGIN_FIELD": "email",
     "USER_CREATE_PASSWORD_RETYPE": True,
@@ -182,26 +156,15 @@ DJOSER = {
     "PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND": True,
     "SERIALIZERS": {
         "user_create": "accounts.serializers.UserCreateSerializer",
-        # "user": "accounts.serializers.UserCreateSerializer",
-        # "user_delete": "djoser.serializers.UserDeleteSerializer",
     },
 }
 
-DOMAIN="localhost:3000"
-SITE_NAME="Auth System"
-
-def capitalize_tags(endpoints, **kwargs):
-    """Capitalize auto-generated tags (e.g. 'auth' → 'Auth')."""
-    for path, path_regex, method, callback in endpoints:
-        if hasattr(callback, 'cls'):
-            # Check if the view already has explicit tags via @extend_schema
-            pass  # drf-spectacular handles tag generation later
-    return endpoints
+DOMAIN = "localhost:3000"
+SITE_NAME = "Auth System"
 
 
 def postprocess_capitalize_tags(result, generator, request, public):
     """Post-process the schema to capitalize all tag names."""
-    tag_map = {}
     for path_data in result.get('paths', {}).values():
         for operation in path_data.values():
             if isinstance(operation, dict) and 'tags' in operation:
@@ -209,7 +172,6 @@ def postprocess_capitalize_tags(result, generator, request, public):
                     tag.title() if tag.islower() else tag
                     for tag in operation['tags']
                 ]
-    # Also update the top-level tags list
     if 'tags' in result:
         for tag_obj in result['tags']:
             if tag_obj.get('name', '').islower():
@@ -218,17 +180,19 @@ def postprocess_capitalize_tags(result, generator, request, public):
 
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "POS System API",
-    "DESCRIPTION": "API documentation for the Django Auth System project.",
+    "TITLE": "Omni Channel API",
+    "DESCRIPTION": "API documentation for the Omni channel project.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     'SCHEMA_PATH_PREFIX': r'/api/v[0-9]',
     'POSTPROCESSING_HOOKS': [
         'drf_spectacular.hooks.postprocess_schema_enums',
-        'backend.settings.postprocess_capitalize_tags',
+        'backend.settings.base.postprocess_capitalize_tags',
     ],
     'ENUM_NAME_OVERRIDES': {
         'OrderStatusEnum': 'orders.models.OrderStatus',
+        'SyncStatusEnum': 'integrations.models.SyncStatus',
+        'PublishStatusEnum': 'menus.models.menu_location_channel.PublishStatus',
     },
     'REDOC_UI_SETTINGS': {
         'hideDownloadButton': True,
@@ -237,8 +201,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 
-
-
+# DATABASE
 DATABASES = {
     "default": {
         "ENGINE": config("DB_ENGINE", default="django.db.backends.sqlite3"),
@@ -250,7 +213,6 @@ DATABASES = {
     }
 }
 
-# Neon (and most cloud Postgres) requires SSL
 if config("DB_SSLMODE", default=""):
     DATABASES["default"]["OPTIONS"] = {
         "sslmode": config("DB_SSLMODE"),
@@ -261,8 +223,8 @@ DATABASE_ROUTERS = (
 )
 
 TENANT_SUBDOMAIN_BASED_ROUTING = False
-TENANT_MODEL = "accounts.Merchant"  # app.Model
-TENANT_DOMAIN_MODEL = "accounts.Domain"  # app.Model
+TENANT_MODEL = "accounts.Merchant"
+TENANT_DOMAIN_MODEL = "accounts.Domain"
 PUBLIC_SCHEMA_NAME = "public"
 
 # General Email Settings
@@ -276,6 +238,3 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
-
-TENANT_TESTING = True  # prevents schema drop issues in tests
-TESTING = True

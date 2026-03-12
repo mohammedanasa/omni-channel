@@ -61,4 +61,17 @@ class InternalPOSAdapter(AbstractChannelAdapter):
     def handle_webhook(
         self, event_type: str, payload: dict, headers: dict
     ) -> WebhookResult:
+        # Route menu events to the menu handler
+        if event_type.startswith("menu.") or event_type.startswith("item."):
+            return self.handle_menu_webhook(event_type, payload, headers)
         return WebhookResult(success=True, action="noop", message="Internal POS: no-op.")
+
+    def handle_menu_webhook(
+        self, event_type: str, payload: dict, headers: dict
+    ) -> WebhookResult:
+        # Internal POS: DB is source of truth, no external menu to pull
+        return WebhookResult(
+            success=True,
+            action="noop",
+            message="Internal POS: menu is the database.",
+        )

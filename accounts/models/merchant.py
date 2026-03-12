@@ -4,7 +4,8 @@ from django_tenants.models import TenantMixin
 
 from .user import User
 
-class Merchant(BaseUUIDModel,TenantMixin):
+
+class Merchant(BaseUUIDModel, TenantMixin):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="merchants")
 

@@ -3,7 +3,12 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(python:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "WebFetch(domain:api-docs.deliveroo.com)",
+      "WebSearch",
+      "Bash(source .venv/bin/activate && python manage.py spectacular --validate --fail-on-warn 2>&1 | tail -20)",
+      "Bash(source .venv/bin/activate && python manage.py check 2>&1)",
+      "Bash(source .venv/bin/activate && python manage.py spectacular --validate --fail-on-warn 2>&1 | tail -5)"
     ]
   }
 }

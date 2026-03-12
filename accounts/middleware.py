@@ -16,6 +16,7 @@ class TenantFromHeaderMiddleware:
         "/api/v1/orders/",
         "/api/v1/webhooks/endpoints/",
         "/api/v1/webhooks/logs/",
+        "/api/v1/menus/",
     ]
 
     # Paths that resolve tenant themselves (e.g. from ChannelLink UUID)

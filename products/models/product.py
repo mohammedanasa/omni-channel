@@ -627,7 +627,19 @@ class Product(BaseUUIDModel):
         Inactive products are archived but retained for history.
         """
     )
-    
+
+    managed_by = models.CharField(
+        max_length=50,
+        blank=True,
+        default="internal_pos",
+        help_text=(
+            "Channel slug of the system that owns this product's core data. "
+            "'internal_pos' = created locally or seeded from a marketplace. "
+            "Any other value matches a Channel.slug where channel_type='pos' "
+            "(e.g. 'clover', 'square'). Stamped by pull_and_persist()."
+        ),
+    )
+
     # ========== META ==========
     
     class Meta:

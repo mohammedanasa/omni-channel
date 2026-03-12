@@ -76,6 +76,26 @@ class AbstractChannelAdapter(ABC):
         """Process an inbound webhook event."""
         ...
 
+    # ── Menu change webhooks (optional) ────────────────────────
+
+    def handle_menu_webhook(
+        self, event_type: str, payload: dict, headers: dict
+    ) -> WebhookResult:
+        """
+        Handle inbound menu/item change events from external channels.
+
+        Override in adapters that receive product updates via webhook
+        (e.g., POS systems pushing menu changes).
+
+        Supported event patterns: menu.updated, item.updated,
+        item.created, item.deleted, item.86d (86'd/unavailable).
+        """
+        return WebhookResult(
+            success=True,
+            action="not_implemented",
+            message=f"Menu webhook '{event_type}' not implemented for this adapter.",
+        )
+
     # ── Lifecycle hooks (optional) ─────────────────────────────
 
     def on_link_activated(self) -> None:

@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from common.models import BaseUUIDModel
 
 
@@ -51,9 +52,44 @@ class ChannelLink(BaseUUIDModel):
     def __str__(self):
         return f"{self.channel} @ {self.location}"
 
+    def save(self, *args, **kwargs):
+        self._enforce_single_pos_per_location()
+        super().save(*args, **kwargs)
+
+    def _enforce_single_pos_per_location(self):
+        """Ensure at most one active POS-type channel link per location."""
+        if not self.is_active:
+            return
+        if self.channel.channel_type != "pos":
+            return
+
+        conflict = (
+            ChannelLink.objects.filter(
+                location=self.location,
+                channel__channel_type="pos",
+                is_active=True,
+            )
+            .exclude(pk=self.pk)
+            .select_related("channel")
+            .first()
+        )
+        if conflict:
+            raise ValidationError(
+                f"Only one active POS per location is allowed. "
+                f"Deactivate '{conflict.channel.display_name}' at "
+                f"'{self.location}' first."
+            )
+
 
 class ProductChannelConfig(BaseUUIDModel):
-    """Per-product, per-channel configuration within a location."""
+    """
+    Per-product, per-channel configuration within a location.
+
+    This model is the admin/API-facing interface for channel-specific
+    pricing and availability. On save, it writes through to
+    ProductLocation.channels JSONField to maintain a single source of
+    truth for price/availability resolution.
+    """
 
     product_location = models.ForeignKey(
         "products.ProductLocation",
@@ -82,3 +118,27 @@ class ProductChannelConfig(BaseUUIDModel):
 
     def __str__(self):
         return f"{self.product_location} → {self.channel}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Write-through to ProductLocation.channels for single source of truth
+        self._sync_to_product_location()
+
+    def delete(self, *args, **kwargs):
+        pl = self.product_location
+        channel_slug = self.channel.slug
+        super().delete(*args, **kwargs)
+        # Remove channel data from ProductLocation.channels
+        if pl.channels and channel_slug in pl.channels:
+            del pl.channels[channel_slug]
+            pl.save(update_fields=["channels"])
+
+    def _sync_to_product_location(self):
+        """Sync price and availability to ProductLocation.channels JSONField."""
+        pl = self.product_location
+        pl.set_channel_data(
+            self.channel.slug,
+            price=self.price,
+            is_available=self.is_available,
+        )
+        pl.save(update_fields=["channels"])

@@ -5,7 +5,7 @@ class MerchantSerializer(drf_serializers.ModelSerializer):
     """General serializer for listing and detail views."""
     class Meta:
         model = Merchant
-        fields = ["id", "name", "owner"]  # owner returned to show relationship
+        fields = ["id", "name", "owner"]
         read_only_fields = ["id", "owner"]
 
 

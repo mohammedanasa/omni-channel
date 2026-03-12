@@ -20,14 +20,15 @@ from ..serializers import (
     BulkProductSyncSerializer,
 )
 from ..services import MenuService, AvailabilityService, PricingService, ProductService
+from common.constants import INTERNAL_POS_SLUG
 from helpers.permissions.permissions import HasTenantAccess
 from helpers.common import tenant_schema, TENANT_HEADER, LOCATION_HEADER
-from .mixins import HeaderContextMixin
+from .mixins import HeaderContextMixin, CatalogWriteProtectionMixin
 from .constants import CHANNEL_HEADER, PRODUCT_TYPE_FILTER
 
 
 @tenant_schema("Products", LOCATION_HEADER)
-class ProductViewSet(HeaderContextMixin, viewsets.ModelViewSet):
+class ProductViewSet(CatalogWriteProtectionMixin, HeaderContextMixin, viewsets.ModelViewSet):
     """
     Complete product management viewset with custom actions.
 
@@ -470,6 +471,23 @@ class ProductViewSet(HeaderContextMixin, viewsets.ModelViewSet):
             return Response(
                 {'error': 'plus must be a list of PLU codes'},
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Check per-product write protection
+        managed_products = Product.objects.filter(
+            plu__in=plus,
+        ).exclude(
+            managed_by__in=("", INTERNAL_POS_SLUG),
+        ).values_list("plu", "managed_by")
+        if managed_products:
+            blocked = {plu: src for plu, src in managed_products}
+            return Response(
+                {
+                    "error": "Cannot delete POS-managed products. "
+                    "Remove them from the external POS and re-sync.",
+                    "blocked": blocked,
+                },
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         result = ProductService.bulk_delete(plus)

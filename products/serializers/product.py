@@ -280,9 +280,9 @@ class ProductSerializer(serializers.ModelSerializer):
             'beverage_info', 'packaging', 'supplemental_info', 'product_tags',
             
             # Metadata
-            'created_at', 'updated_at', 'is_active',
+            'created_at', 'updated_at', 'is_active', 'managed_by',
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'managed_by']
         extra_kwargs = {
             'plu': {'required': False}  # Auto-generated if not provided
         }

@@ -15,4 +15,5 @@ urlpatterns = [
     path("", include("integrations.urls")),
     path("", include("orders.urls")),
     path("", include("webhooks.urls")),
+    path("", include("menus.urls")),
 ]
